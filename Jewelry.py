@@ -6,7 +6,7 @@ class AddRing:
   def Activated(self):
     App.Console.PrintMessage('Hello, World!')
     doc = App.activeDocument()
-    
+
     #e = Part.Ellipse()
     #e.MajorRadius = 3
     #e.MinorRadius = 1
@@ -39,4 +39,20 @@ class AddRing:
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'More detailed text'}
 
 
+
+class AddRingElliptical:
+  def Activated(self):
+    doc = App.activeDocument()
+    import RingElliptical
+    obj = doc.addObject("Part::FeaturePython", "Elliptischer Ring")
+    RingElliptical.RingElliptical(obj)
+    obj.ViewObject.Proxy = 0
+    doc.recompute()
+
+  def GetResources(self):
+    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Elliptical Ring', 'ToolTip': 'More detailed text'}
+
+
+
 Gui.addCommand('AddRing', AddRing())
+Gui.addCommand('AddRingElliptical', AddRingElliptical())

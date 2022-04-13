@@ -6,7 +6,7 @@ class JewelryWorkbench(Workbench):
   def Initialize(self):
     """This function is executed when FreeCAD starts"""
     import Jewelry#, MyModuleB # import here all the needed files that create your FreeCAD commands
-    self.list = ["AddRing"] # A list of command names created in the line above
+    self.list = ["AddRing", "AddRingElliptical"] # A list of command names created in the line above
     self.appendToolbar("Jewelry", self.list) # creates a new toolbar with your commands
     self.appendMenu("Jewelry", self.list) # creates a new menu
     #self.appendMenu(["Jewelry", "My submenu"], self.list) # appends a submenu to an existing menu
