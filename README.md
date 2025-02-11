@@ -5,7 +5,7 @@ This project provides tools for goldsmiths and jewelry designers to model rings 
 
 ## Current Features
 - Adding parametric rings
-- Importing [GemCad](https://www.gemcad.com/) *.asc files
+- Importing [GemCad](https://www.gemcad.com/)/[Datavue II](http://www.gemcutter.com/dv_prg.htm) *.asc files
 - Generating bezel settings for arbitrary faceted gemstones
 
 ## Basic Usage
@@ -16,4 +16,4 @@ The workbench can now automatically generate a bezel setting for the gem. To do 
 
 ## License
 This project is licensed under the terms of the GNU Affero General Public License, version 3 or any later version.  
-If in the future compatibility issues with other projects arise, I'm open to changing the license to plain GPL or the LGPL and I would like to ask potential contributers to agree to that.
+I'm not sure this is the right license for an LGPL project like FreeCAD, so if in the future compatibility issues with other projects arise, I'm open to changing the license to plain GPL or the LGPL and I would like to ask potential contributers to agree to that.

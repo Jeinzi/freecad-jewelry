@@ -1,13 +1,14 @@
 # Copyright 2025-2025, Julian Heinzel and the freecad-jewelry contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-import os
 import builtins
-import numpy as np
 import FreeCAD as App
 import Part
 
+
 def insert(filename, arg2):
+  # See [GemCad user guide](https://www.gemcad.com/downloads/gemcadman.pdf),
+  # page 21 for reference.
   with builtins.open(filename) as file:
     # Create raw block of material.
     # ToDo: Make sure block size is sufficient.
@@ -16,10 +17,12 @@ def insert(filename, arg2):
     block.Placement.Base = (-blockSize / 2, -blockSize / 2, -blockSize / 2)
 
     # Skip all lines that do not define planes.
-    for l in file:
-      if l[0] == 'g':
-        fullRotation = int(l.split(' ')[1])
-      if l[0] == 'a':
+    for line in file:
+      if line[0] == 'g':
+        # Index gear.
+        fullRotation = int(line.split(' ')[1])
+      if line[0] == 'a':
+        # Header is done, now facet data is coming.
         break
 
     # Create a basic plane.
@@ -40,33 +43,49 @@ def insert(filename, arg2):
     templateFace = Part.Face(Part.Wire(edges))
 
     # Parse cutting planes.
-    while l:
-      arr = l.split(' ')[1:]
-      planeAngle = float(arr[0])
-      if planeAngle < 0:
-        planeAngle += 180
-      r = arr[1]
+    while line:
+      instructions = line.split(' ')
+      if instructions[0] != "a":
+        # If line does not begin with a, it (probably?) does not
+        # define facets. A line can begin with "F" for the footnote
+        # or G for cutting instructions.
+        line = file.readline()
+        continue
+
+      facetAngle = float(instructions[1])
+      if facetAngle < 0:
+        facetAngle += 180
+      r = float(instructions[2])
       skipNext = False
-      for zAngle in arr[2:]:
+      for i in instructions[3:]:
         if skipNext:
           skipNext = False
           continue
-        if zAngle == "n":
+        if i == "n":
+          # The name of the facet will follow.
           skipNext = True
           continue
+        if i == "G":
+          # This introduces a comment until the end of the line.
+          break
 
-        zAngle = int(zAngle) / fullRotation * 360
+        # If no special letter instruction is detected, i is the
+        # index within the previously defined full rotation.
+        zAngle = float(i) / fullRotation * 360
 
         face = templateFace.copy()
         face.Placement.Base = (0, 0, r)
-        face.rotate(App.Vector(), App.Vector(1,0,0), planeAngle)
+        face.rotate(App.Vector(), App.Vector(1,0,0), facetAngle)
         face.rotate(App.Vector(), App.Vector(0,0,1), zAngle)
         extrusion = face.extrude(blockSize * face.normalAt(0,0))
         block = block.cut(extrusion)
 
-      l = file.readline()
+      line = file.readline()
+
   gem = App.ActiveDocument.addObject("Part::Feature", "Gem")
   gem.Shape = block
+  #gem.ViewObject.DisplayMode = "Shaded"
+  gem.ViewObject.Transparency = 20
   App.ActiveDocument.recompute()
 
 
