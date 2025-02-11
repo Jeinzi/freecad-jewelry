@@ -10,13 +10,12 @@ import Part
 def insert(filename, arg2):
   with builtins.open(filename) as file:
     # Create raw block of material.
+    # ToDo: Make sure block size is sufficient.
     blockSize = 10
     block = Part.makeBox(blockSize, blockSize, blockSize)
     block.Placement.Base = (-blockSize / 2, -blockSize / 2, -blockSize / 2)
-    #Part.show(block)
 
     # Skip all lines that do not define planes.
-    #fullRotation = 96
     for l in file:
       if l[0] == 'g':
         fullRotation = int(l.split(' ')[1])
@@ -62,14 +61,15 @@ def insert(filename, arg2):
         face.Placement.Base = (0, 0, r)
         face.rotate(App.Vector(), App.Vector(1,0,0), planeAngle)
         face.rotate(App.Vector(), App.Vector(0,0,1), zAngle)
-        #Part.show(face)
         extrusion = face.extrude(blockSize * face.normalAt(0,0))
         block = block.cut(extrusion)
 
       l = file.readline()
-  Part.show(block)
-  doc.recompute()
+  gem = App.ActiveDocument.addObject("Part::Feature", "Gem")
+  gem.Shape = block
+  App.ActiveDocument.recompute()
+
 
 def open(filename):
   doc = App.newDocument()
-  insert(filename)
+  insert(filename, None)

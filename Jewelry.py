@@ -19,6 +19,40 @@ class AddRing:
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'More detailed text'}
 
 
+class AddSetting:
+  def Activated(self):
+    doc = App.activeDocument()
+    if not Gui.Selection.getSelection():
+      print("Please select a gemstone.")
+      return
+
+    import GemSetting
+    obj = doc.addObject("Part::FeaturePython", "Setting")
+    GemSetting.Setting(obj)
+    obj.ViewObject.Proxy = 0
+    doc.recompute()
+
+  def GetResources(self):
+    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Setting', 'ToolTip': 'More detailed text'}
+
+
+class ProngSetting:
+  def Activated(self):
+    doc = App.activeDocument()
+    if not Gui.Selection.getSelection():
+      print("Please select a gemstone.")
+      return
+
+    import ProngSetting
+    obj = doc.addObject("Part::FeaturePython", "ProngSetting")
+    ProngSetting.ProngSetting(obj)
+    obj.ViewObject.Proxy = 0
+    doc.recompute()
+
+  def GetResources(self):
+    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Prong Setting', 'ToolTip': 'More detailed text'}
+
+
 
 class AddStoneBrilliant:
   def Activated(self):
@@ -34,3 +68,5 @@ class AddStoneBrilliant:
 
 
 Gui.addCommand('AddRing', AddRing())
+Gui.addCommand('AddSetting', AddSetting())
+#Gui.addCommand('ProngSetting', ProngSetting())
