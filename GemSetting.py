@@ -8,15 +8,15 @@ import FreeCADGui as Gui
 
 
 class Setting:
-  def __init__(self, obj):
+  def __init__(self, obj, selection):
     obj.Proxy = self
+    obj.ViewObject.Proxy = 0
     obj.addProperty("App::PropertyFloat", "WallThickness", "", "Thickness of the outer wall of the bezel setting").WallThickness = 0.3
     obj.addProperty("App::PropertyFloat", "Margin", "", "Spacing between gem and setting").Margin = 0.05
     obj.addProperty("App::PropertyFloat", "StepDepthPercent", "", "How far the step should reach down from the girdle towards the culet in relation to the pavilion depth.").StepDepthPercent = 0.4
     obj.addProperty("App::PropertyFloat", "ProtrusionPercent", "", "How much the setting should protrude above the girdle in relation to the crown height.").ProtrusionPercent = 0.3
     obj.addProperty("App::PropertyBool", "ForceRound", "", "Force outside to be round (useful for brilliants)").ForceRound = False
-    obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = None
-    self.gem = None
+    obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = selection
 
 
   def get_slice(self, obj, z):
@@ -35,23 +35,18 @@ class Setting:
     # - The gem increases in circumference from the bottom to some
     #   point in the middle, where the facets are vertical (girdle), and then gets smaller again.
 
-    # Save reference to gem so the setting can be edited again.
-    if not obj.Gem:
-      obj.Gem = Gui.Selection.getSelection()[0]
-    gem = obj.Gem
-
     # We want to identify one vertex on the upper edge of the
     # girdle (upper_gv) and one on the lower part (lower_gv). To do
     # that, we search for vertices that have the greatest distance from
     # the center line of the stone (within the xy plane, ignoring z).
     # This returns the z coordinates of the gem's girdle.
     # Maybe this could be done more concisely by sorting numpy arrays?
-    c = gem.Shape.BoundBox.Center
+    c = obj.Gem.Shape.BoundBox.Center
     max_r = float("-inf")
     upper_gv = None
     lower_gv = None
     eps = 10**-3
-    for v in gem.Shape.Vertexes:
+    for v in obj.Gem.Shape.Vertexes:
       dx = v.X - c.x
       dy = v.Y - c.y
       r = sqrt(dx**2 + dy**2)
@@ -76,19 +71,19 @@ class Setting:
         upper_gv = v
 
     # Get some lengths to later define other values proportional to them.
-    height = gem.Shape.BoundBox.ZMax - upper_gv.Z   # Length from girdle to top.
-    depth = lower_gv.Z - gem.Shape.BoundBox.ZMin    # Length from girdle to bottom.
+    height = obj.Gem.Shape.BoundBox.ZMax - upper_gv.Z   # Length from girdle to top.
+    depth = lower_gv.Z - obj.Gem.Shape.BoundBox.ZMin    # Length from girdle to bottom.
     girdle = upper_gv.Z - lower_gv.Z
 
     # How far down from the girdle should the step be?
     dz = depth*obj.StepDepthPercent
     # Get cross section at that z coordinate.
-    lower_slice = self.get_slice(gem, lower_gv.Z - dz)
+    lower_slice = self.get_slice(obj.Gem, lower_gv.Z - dz)
 
     # Get cross section at the girdle. For some reason taking the
     # cross section in the middle works, but a cross section at
     # lower_gv.Z sometimes does not (for example pc04001.asc).
-    upper_slice = self.get_slice(gem, lower_gv.Z+girdle/2)
+    upper_slice = self.get_slice(obj.Gem, lower_gv.Z+girdle/2)
 
     # ToDo: Automatically simplify cross sections.
     # For round-ish shapes like a brilliant, a circle can be used.

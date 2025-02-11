@@ -5,6 +5,8 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import Part
 
+import GemSetting
+
 
 class AddRing:
   def Activated(self):
@@ -26,11 +28,10 @@ class AddSetting:
       print("Please select a gemstone.")
       return
 
-    import GemSetting
-    obj = doc.addObject("Part::FeaturePython", "Setting")
-    GemSetting.Setting(obj)
-    obj.ViewObject.Proxy = 0
-    doc.recompute()
+    for sel in Gui.Selection.getSelection():
+      obj = doc.addObject("Part::FeaturePython", "Setting")
+      GemSetting.Setting(obj, sel)
+      obj.recompute()
 
   def GetResources(self):
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Setting', 'ToolTip': 'More detailed text'}
