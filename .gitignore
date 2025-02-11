@@ -1,2 +1,4 @@
 __pycache__
 notes.md
+test/asc/*
+!test/asc/*.py
