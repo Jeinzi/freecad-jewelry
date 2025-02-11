@@ -31,13 +31,20 @@ class RingGeneric:
 
   def execute(self, obj):
     if obj.Profile == "Elliptical":
+      rot = 0
+      w = obj.Width
+      t = obj.Thickness
+      if t > w:
+        # Ellipse major radius can't be bigger than minor radius.
+        rot = 90
+        t,w = w,t
       e = Part.Ellipse()
-      e.MajorRadius = obj.Width / 2
-      e.MinorRadius = obj.Thickness / 2
+      e.MajorRadius = w / 2
+      e.MinorRadius = t / 2
       wire = Part.Wire(e.toShape().Edges)
       face = Part.Face(wire)
-      face.Placement.Rotation = App.Rotation(90, 0, 90)
-      face.Placement.Base = (0, 0, obj.Size/2/math.pi + e.MinorRadius)
+      face.Placement.Rotation = App.Rotation(90, rot, 90)
+      face.Placement.Base = (0, 0, obj.Size/2/math.pi + obj.Thickness/2)
     else:
       v1 = App.Vector(0, -obj.Width/2, 0)
       v2 = App.Vector(0, obj.Width/2, 0)
