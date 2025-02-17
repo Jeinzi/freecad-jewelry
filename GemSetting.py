@@ -19,10 +19,10 @@ class Setting:
     obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = selection
 
 
-  def get_slice(self, obj, z):
+  def get_slice(self, shape, z):
     normal = App.Vector(0, 0, 1)
     wires = []
-    for i in obj.Shape.slice(normal, z):
+    for i in shape.slice(normal, z):
         wires.append(i)
     if len(wires) > 1:
       print("Warning: Unusual gem shape is not supported.")
@@ -34,6 +34,9 @@ class Setting:
     # - The gem has facets and thus vertices.
     # - The gem increases in circumference from the bottom to some
     #   point in the middle, where the facets are vertical (girdle), and then gets smaller again.
+    gem = obj.Gem.Shape.copy()
+    gem.Placement.Rotation.Angle = 0
+    gem.Placement.Base = (0, 0, 0)
 
     # We want to identify one vertex on the upper edge of the
     # girdle (upper_gv) and one on the lower part (lower_gv). To do
@@ -41,12 +44,13 @@ class Setting:
     # the center line of the stone (within the xy plane, ignoring z).
     # This returns the z coordinates of the gem's girdle.
     # Maybe this could be done more concisely by sorting numpy arrays?
-    c = obj.Gem.Shape.BoundBox.Center
+    c = gem.BoundBox.Center
+
     max_r = float("-inf")
     upper_gv = None
     lower_gv = None
     eps = 10**-3
-    for v in obj.Gem.Shape.Vertexes:
+    for v in gem.Vertexes:
       dx = v.X - c.x
       dy = v.Y - c.y
       r = sqrt(dx**2 + dy**2)
@@ -71,19 +75,19 @@ class Setting:
         upper_gv = v
 
     # Get some lengths to later define other values proportional to them.
-    height = obj.Gem.Shape.BoundBox.ZMax - upper_gv.Z   # Length from girdle to top.
-    depth = lower_gv.Z - obj.Gem.Shape.BoundBox.ZMin    # Length from girdle to bottom.
+    height = gem.BoundBox.ZMax - upper_gv.Z   # Length from girdle to top.
+    depth = lower_gv.Z - gem.BoundBox.ZMin    # Length from girdle to bottom.
     girdle = upper_gv.Z - lower_gv.Z
 
     # How far down from the girdle should the step be?
     dz = depth*obj.StepDepthPercent
     # Get cross section at that z coordinate.
-    lower_slice = self.get_slice(obj.Gem, lower_gv.Z - dz)
+    lower_slice = self.get_slice(gem, lower_gv.Z - dz)
 
     # Get cross section at the girdle. For some reason taking the
     # cross section in the middle works, but a cross section at
     # lower_gv.Z sometimes does not (for example pc04001.asc).
-    upper_slice = self.get_slice(obj.Gem, lower_gv.Z+girdle/2)
+    upper_slice = self.get_slice(gem, lower_gv.Z+girdle/2)
 
     # ToDo: Automatically simplify cross sections.
     # For round-ish shapes like a brilliant, a circle can be used.
@@ -122,3 +126,4 @@ class Setting:
     # Fuse upper and lower part of the step together and refine. Done.
     setting = upper_extrusion.fuse(lower_extrusion).removeSplitter()
     obj.Shape = setting
+    obj.Placement = obj.Gem.Placement
