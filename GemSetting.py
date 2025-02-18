@@ -13,8 +13,9 @@ class Setting:
     obj.ViewObject.Proxy = 0
     obj.addProperty("App::PropertyFloat", "WallThickness", "", "Thickness of the outer wall of the bezel setting").WallThickness = 0.3
     obj.addProperty("App::PropertyFloat", "Margin", "", "Spacing between gem and setting").Margin = 0.05
-    obj.addProperty("App::PropertyFloat", "StepDepthPercent", "", "How far the step should reach down from the girdle towards the culet in relation to the pavilion depth.").StepDepthPercent = 0.4
-    obj.addProperty("App::PropertyFloat", "ProtrusionPercent", "", "How much the setting should protrude above the girdle in relation to the crown height.").ProtrusionPercent = 0.3
+    obj.addProperty("App::PropertyFloat", "StepDepthPercentage", "", "How far the step should reach down from the girdle towards the culet in relation to the pavilion depth.").StepDepthPercentage = 0.2
+    obj.addProperty("App::PropertyFloat", "ProtrusionPercentage", "", "How much the setting should protrude above the girdle in relation to the crown height.").ProtrusionPercentage = 0.3
+    obj.addProperty("App::PropertyFloat", "BottomExtension", "", "How much deeper the setting extends below the culet, in mm.").BottomExtension = 0.2
     obj.addProperty("App::PropertyBool", "ForceRound", "", "Force outside to be round (useful for brilliants)").ForceRound = False
     obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = selection
 
@@ -80,7 +81,7 @@ class Setting:
     girdle = upper_gv.Z - lower_gv.Z
 
     # How far down from the girdle should the step be?
-    dz = depth*obj.StepDepthPercent
+    dz = depth*obj.StepDepthPercentage
     # Get cross section at that z coordinate.
     lower_slice = self.get_slice(gem, lower_gv.Z - dz)
 
@@ -120,8 +121,8 @@ class Setting:
     upper_face = Part.makeFace(upper_compound)
 
     # ...so they can be extruded to form a solid.
-    lower_extrusion = lower_face.extrude(App.Vector(0, 0, -depth+dz))
-    upper_extrusion = upper_face.extrude(App.Vector(0, 0, dz + girdle + height*obj.ProtrusionPercent))
+    lower_extrusion = lower_face.extrude(App.Vector(0, 0, -depth-obj.BottomExtension+dz))
+    upper_extrusion = upper_face.extrude(App.Vector(0, 0, dz + girdle + height*obj.ProtrusionPercentage))
 
     # Fuse upper and lower part of the step together and refine. Done.
     setting = upper_extrusion.fuse(lower_extrusion).removeSplitter()
