@@ -12,6 +12,8 @@ import RingGeneric
 
 class AddRing:
   def Activated(self):
+    if App.activeDocument() is None:
+      App.newDocument()
     doc = App.activeDocument()
 
     # Use custom profile if a sketch is selected.
@@ -31,6 +33,12 @@ class AddRing:
 
 
 class AddSetting:
+  def IsActive(self):
+    for sel in Gui.Selection.getSelection():
+      if bool(sel.Shape.Solids):
+        return True
+    return False
+
   def Activated(self):
     doc = App.activeDocument()
     if not Gui.Selection.getSelection():
