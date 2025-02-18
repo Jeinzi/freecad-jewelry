@@ -13,24 +13,24 @@ class RingGeneric:
       obj.ViewObject.Proxy = 0
 
     # https://wiki.freecad.org/FeaturePython_Custom_Properties
-    obj.addProperty("App::PropertyFloat", "Size", "", "Inner ring circumference in mm (ISO 8653:2016)").Size = 57
-    obj.addProperty("App::PropertyFloat", "Width", "", "Axial width of the ring").Width = 5
-    obj.addProperty("App::PropertyFloat", "Thickness", "", "Radial thickness of the ring").Thickness = 2
+    obj.addProperty("App::PropertyFloat", "Size", "", "Inner ring circumference in mm. (ISO 8653:2016)").Size = 57
+    obj.addProperty("App::PropertyFloat", "Width", "", "Axial width of the ring.").Width = 5
+    obj.addProperty("App::PropertyFloat", "Thickness", "", "Radial thickness of the ring.").Thickness = 2
     #obj.addProperty("App::PropertyBool", "Correct_Shrinkage", "", "Correct for shrinking of cast material when cooling").Correct_Shrinkage = True
-    obj.addProperty("App::PropertyEnumeration", "Profile").Profile = ["Elliptical", "Rectangular"]
-    obj.addProperty("App::PropertyLink", "CustomProfile")
+    obj.addProperty("App::PropertyEnumeration", "Profile", "", "Presets for the ring cross section. Will be ignored if custom sketch is linked.").Profile = ["Elliptical", "Rectangular"]
+    obj.addProperty("App::PropertyLink", "CustomProfile", "", "Select a sketch with a custom cross section.")
     if sketch is not None:
       obj.CustomProfile = sketch
 
     # https://en.wikipedia.org/wiki/Ring_size
     title_size_section = "International Sizes (read only)"
-    obj.addProperty("App::PropertyFloat", "North_American", title_size_section, "Ring size used in Canada, Mexico and the US", read_only=True)
-    obj.addProperty("App::PropertyFloat", "Swiss", title_size_section, "Ring size used in Switzerland, Italy and Spain", read_only=True)
-    obj.addProperty("App::PropertyFloat", "Diameter", title_size_section, "Inner diameter in mm", read_only=True)
+    obj.addProperty("App::PropertyFloat", "NorthAmerican", title_size_section, "Ring size used in Canada, Mexico and the US.", read_only=True)
+    obj.addProperty("App::PropertyFloat", "Swiss", title_size_section, "Ring size used in Switzerland, Italy and Spain.", read_only=True)
+    obj.addProperty("App::PropertyFloat", "Diameter", title_size_section, "Inner diameter in mm.", read_only=True)
 
 
   def update_sizes(self, obj):
-    obj.North_American = (obj.Size - 36.5) / (2.55348651)
+    obj.NorthAmerican = (obj.Size - 36.5) / (2.55348651)
     obj.Diameter = obj.Size/math.pi
     obj.Swiss = obj.Size - 40
 

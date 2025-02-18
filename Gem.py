@@ -10,9 +10,9 @@ class Gem:
   def __init__(self, obj, shape, name):
     obj.Proxy = self
     obj.Shape = shape
-    obj.addProperty("App::PropertyString", "Name", "", "Name of the gem - does not matter").Name = name
-    obj.addProperty("App::PropertyFloat", "Density", "", "Density of the gemstone in kg/m³").Density = 3515
-    obj.addProperty("App::PropertyFloat", "Carats", "", "Weight of the gem in ct").Carats = self.calc_carats(obj)
+    obj.addProperty("App::PropertyString", "Name", "", "Name of the gem - does not matter.").Name = name
+    obj.addProperty("App::PropertyFloat", "Density", "", "Density of the gemstone in kg/m³.").Density = 3515
+    obj.addProperty("App::PropertyFloat", "Carats", "", "Weight of the gem in ct.").Carats = self.calc_carats(obj)
     self.last_carats = obj.Carats
 
     if obj.ViewObject is not None:

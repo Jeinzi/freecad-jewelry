@@ -27,7 +27,7 @@ class AddRing:
     obj.recompute()
 
   def GetResources(self):
-    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'More detailed text'}
+    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'A ring with arbitrary profile and parametric size.'}
 
 
 
@@ -40,9 +40,6 @@ class AddSetting:
 
   def Activated(self):
     doc = App.activeDocument()
-    if not Gui.Selection.getSelection():
-      print("Please select a gemstone.")
-      return
 
     for sel in Gui.Selection.getSelection():
       obj = doc.addObject("Part::FeaturePython", "Setting")
@@ -50,7 +47,7 @@ class AddSetting:
       obj.recompute()
 
   def GetResources(self):
-    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Setting', 'ToolTip': 'More detailed text'}
+    return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Bezel Setting', 'ToolTip': 'A setting enclosing the gem all around. Select gem to use.'}
 
 
 

@@ -11,11 +11,11 @@ class Setting:
   def __init__(self, obj, selection):
     obj.Proxy = self
     obj.ViewObject.Proxy = 0
-    obj.addProperty("App::PropertyFloat", "WallThickness", "", "Thickness of the outer wall of the bezel setting").WallThickness = 0.3
-    obj.addProperty("App::PropertyFloat", "Margin", "", "Spacing between gem and setting").Margin = 0.05
-    obj.addProperty("App::PropertyFloat", "StepDepthPercentage", "", "How far the step should reach down from the girdle towards the culet in relation to the pavilion depth.").StepDepthPercentage = 0.2
+    obj.addProperty("App::PropertyFloat", "WallThickness", "", "Thickness of the outer wall of the bezel setting.").WallThickness = 0.3
+    obj.addProperty("App::PropertyFloat", "Margin", "", "Radial spacing between gem and setting.").Margin = 0.05
+    obj.addProperty("App::PropertyFloat", "StepDepthPercentage", "", "How far down from the girdle the step is placed, in relation to the pavilion height.").StepDepthPercentage = 0.2
     obj.addProperty("App::PropertyFloat", "ProtrusionPercentage", "", "How much the setting should protrude above the girdle in relation to the crown height.").ProtrusionPercentage = 0.3
-    obj.addProperty("App::PropertyFloat", "BottomExtension", "", "How much deeper the setting extends below the culet, in mm.").BottomExtension = 0.2
+    obj.addProperty("App::PropertyFloat", "BottomExtension", "", "How far the setting extends below the culet, in mm.").BottomExtension = 0.2
     obj.addProperty("App::PropertyFloat", "MaxNoncircularity", "", "Up to which deviation from an ideal circle the circular approximation is used, in percent.").MaxNoncircularity = 0.05
     obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = selection
 
