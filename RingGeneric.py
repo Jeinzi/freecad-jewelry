@@ -9,6 +9,9 @@ import FreeCAD as App
 class RingGeneric:
   def __init__(self, obj, sketch=None):
     obj.Proxy = self
+    if obj.ViewObject is not None:
+      obj.ViewObject.Proxy = 0
+
     # https://wiki.freecad.org/FeaturePython_Custom_Properties
     obj.addProperty("App::PropertyFloat", "Size", "", "Inner ring circumference in mm (ISO 8653:2016)").Size = 57
     obj.addProperty("App::PropertyFloat", "Width", "", "Axial width of the ring").Width = 5
@@ -36,7 +39,7 @@ class RingGeneric:
     if obj.CustomProfile is not None:
       shape = obj.CustomProfile.Shape.copy()
       shape.Placement.Base.z = obj.Size/2/math.pi
-      face = Part.Face(shape)
+      face = Part.Face(shape.Wires)
     elif obj.Profile == "Elliptical":
       rot = 0
       w = obj.Width

@@ -24,8 +24,7 @@ class AddRing:
 
     obj = doc.addObject("Part::FeaturePython", "Ring")
     RingGeneric.RingGeneric(obj, sketch)
-    obj.ViewObject.Proxy = 0
-    doc.recompute()
+    obj.recompute()
 
   def GetResources(self):
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'More detailed text'}
