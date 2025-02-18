@@ -27,10 +27,14 @@ def insert(path, arg2):
     block.Placement.Base = (-blockSize / 2, -blockSize / 2, -blockSize / 2)
 
     # Skip all lines that do not define planes.
+    header = []
+    footer = []
     for line in file:
       if line[0] == 'g':
         # Index gear.
         fullRotation = int(line.split(' ')[1])
+      if line[0] == "H":
+        header.append(line[2:])
       if line[0] == 'a':
         # Header is done, now facet data is coming.
         break
@@ -56,7 +60,8 @@ def insert(path, arg2):
     instruction_lines = [line]
     for line in file:
       if line.startswith("F"):
-        continue # Skip footers.
+        footer.append(line[2:])
+        continue
       instruction_lines.append(line)
 
     # Instructions are separated by spaces. Related instructions can
@@ -131,7 +136,7 @@ def insert(path, arg2):
 
   filename = path.split("/")[-1].split(".")[0]
   gem = App.ActiveDocument.addObject("Part::FeaturePython", "Gem")
-  Gem.Gem(gem, block, filename)
+  Gem.Gem(gem, block, filename, "".join(header).strip(), "".join(footer).strip())
   App.ActiveDocument.recompute()
 
 

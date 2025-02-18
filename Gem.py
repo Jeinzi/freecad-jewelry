@@ -7,13 +7,18 @@ import FreeCAD as App
 
 
 class Gem:
-  def __init__(self, obj, shape, name):
+  def __init__(self, obj, shape, name, header=None, footer=None):
     obj.Proxy = self
     obj.Shape = shape
     obj.addProperty("App::PropertyString", "Name", "", "Name of the gem - does not matter.").Name = name
     obj.addProperty("App::PropertyFloat", "Density", "", "Density of the gemstone in kg/m³.").Density = 3515
     obj.addProperty("App::PropertyFloat", "Carats", "", "Weight of the gem in ct.").Carats = self.calc_carats(obj)
     self.last_carats = obj.Carats
+
+    if header:
+      obj.addProperty("App::PropertyString", "Header", "", "Header found in the asc file.").Header = header
+    if footer:
+      obj.addProperty("App::PropertyString", "Footer", "", "Footer found in the asc file.").Footer = footer
 
     if obj.ViewObject is not None:
       # ViewObject does not exist in headless mode.
