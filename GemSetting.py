@@ -16,7 +16,7 @@ class Setting:
     obj.addProperty("App::PropertyFloat", "StepDepthPercentage", "", "How far the step should reach down from the girdle towards the culet in relation to the pavilion depth.").StepDepthPercentage = 0.2
     obj.addProperty("App::PropertyFloat", "ProtrusionPercentage", "", "How much the setting should protrude above the girdle in relation to the crown height.").ProtrusionPercentage = 0.3
     obj.addProperty("App::PropertyFloat", "BottomExtension", "", "How much deeper the setting extends below the culet, in mm.").BottomExtension = 0.2
-    obj.addProperty("App::PropertyBool", "ForceRound", "", "Force outside to be round (useful for brilliants)").ForceRound = False
+    obj.addProperty("App::PropertyFloat", "MaxNoncircularity", "", "Up to which deviation from an ideal circle the circular approximation is used, in percent.").MaxNoncircularity = 0.05
     obj.addProperty("App::PropertyLink", "Gem", "", "Which gem needs a setting?").Gem = selection
 
 
@@ -30,11 +30,24 @@ class Setting:
     return wires[0]
 
 
+  def is_similar(self, wire1, wire2, max_deviation):
+    # Checks whether to wires span about the same area.
+    face1 = Part.makeFace(wire1)
+    face2 = Part.makeFace(wire2)
+    dissimilarity = face1.Area/face2.Area - 1
+    if abs(dissimilarity) < max_deviation:
+      return True
+    return False
+
+
   def execute(self, obj):
     # Assumptions for the setting generator:
     # - The gem has facets and thus vertices.
     # - The gem increases in circumference from the bottom to some
     #   point in the middle, where the facets are vertical (girdle), and then gets smaller again.
+
+    # First, we'll move a copy of the gem to its original position.
+    # There, the table must face in the z direction for all of the following to work.
     gem = obj.Gem.Shape.copy()
     gem.Placement.Rotation.Angle = 0
     gem.Placement.Base = (0, 0, 0)
@@ -90,15 +103,28 @@ class Setting:
     # lower_gv.Z sometimes does not (for example pc04001.asc).
     upper_slice = self.get_slice(gem, lower_gv.Z+girdle/2)
 
-    # ToDo: Automatically simplify cross sections.
-    # For round-ish shapes like a brilliant, a circle can be used.
-    # This must be manually forced for now.
-    # For other shapes, maybe line segments, arcs or splines could
-    # be used to approximate the 2D offset.
-    if obj.ForceRound:
-      upper_center = App.Vector(c.x, c.y, lower_gv.Z+girdle/2)
-      normal = App.Vector(0, 0, 1)
-      upper_slice = Part.Circle(upper_center, normal, max_r).toShape()
+    # Automatically simplify cross sections.
+    # For round-ish shapes like a brilliant, a circle is used.
+    # ToDo: For other shapes, maybe line segments, arcs or splines
+    # could be used to approximate the 2D offset.
+    upper_center = App.Vector(c.x, c.y, lower_gv.Z+girdle/2)
+    normal = App.Vector(0, 0, 1)
+    upper_circle = Part.Circle(upper_center, normal, max_r).toShape()
+    if self.is_similar(upper_slice, upper_circle, obj.MaxNoncircularity):
+      upper_slice = upper_circle
+
+    # Check whether lower section is more or less a circle as well.
+    lower_max_r = float("-inf")
+    lower_center = App.Vector(c.x, c.y, lower_gv.Z - dz)
+    for v in lower_slice.Vertexes:
+      dx = v.X - lower_center.x
+      dy = v.Y - lower_center.y
+      r = sqrt(dx**2 + dy**2)
+      if r > lower_max_r:
+        lower_max_r = r
+    lower_circle = Part.Circle(lower_center, normal, lower_max_r).toShape()
+    if self.is_similar(lower_slice, lower_circle, obj.MaxNoncircularity):
+      lower_slice = lower_circle
 
     # Move girdle cross section down to the step.
     upper_slice = upper_slice.translate(App.Vector(0, 0, -dz-girdle/2))
@@ -124,7 +150,8 @@ class Setting:
     lower_extrusion = lower_face.extrude(App.Vector(0, 0, -depth-obj.BottomExtension+dz))
     upper_extrusion = upper_face.extrude(App.Vector(0, 0, dz + girdle + height*obj.ProtrusionPercentage))
 
-    # Fuse upper and lower part of the step together and refine. Done.
+    # Fuse upper and lower part of the step together and refine.
+    # Then move setting to gem position.
     setting = upper_extrusion.fuse(lower_extrusion).removeSplitter()
     obj.Shape = setting
     obj.Placement = obj.Gem.Placement
