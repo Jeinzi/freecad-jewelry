@@ -1,10 +1,11 @@
 # Copyright 2025-2025, Julian Heinzel and the freecad-jewelry contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-import builtins
-from enum import Enum
-import FreeCAD as App
+import Gem
 import Part
+import builtins
+import FreeCAD as App
+from enum import Enum
 
 
 class AscParsingState(Enum):
@@ -15,10 +16,10 @@ class AscParsingState(Enum):
   Index = 4
 
 
-def insert(filename, arg2):
+def insert(path, arg2):
   # See [GemCad user guide](https://www.gemcad.com/downloads/gemcadman.pdf),
   # page 21 for reference.
-  with builtins.open(filename, encoding="ISO-8859-1") as file:
+  with builtins.open(path, encoding="ISO-8859-1") as file:
     # Create raw block of material.
     # ToDo: Make sure block size is sufficient.
     blockSize = 10
@@ -128,15 +129,12 @@ def insert(filename, arg2):
         extrusion = face.extrude(blockSize * face.normalAt(0,0))
         block = block.cut(extrusion)
 
-  gem = App.ActiveDocument.addObject("Part::Feature", "Gem")
-  gem.Shape = block
-  if gem.ViewObject is not None:
-    # ViewObject does not exist in headless mode.
-    #gem.ViewObject.DisplayMode = "Shaded"
-    gem.ViewObject.Transparency = 20
+  filename = path.split("/")[-1].split(".")[0]
+  gem = App.ActiveDocument.addObject("Part::FeaturePython", "Gem")
+  Gem.Gem(gem, block, filename)
   App.ActiveDocument.recompute()
 
 
-def open(filename):
+def open(path):
   doc = App.newDocument()
-  insert(filename, None)
+  insert(path, None)
