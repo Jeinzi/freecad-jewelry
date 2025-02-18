@@ -1,24 +1,33 @@
 # Copyright 2022-2025, Julian Heinzel and the freecad-jewelry contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import Part
 import FreeCAD as App
 import FreeCADGui as Gui
-import Part
 
 import GemSetting
+import RingGeneric
+
 
 
 class AddRing:
   def Activated(self):
     doc = App.activeDocument()
-    import RingGeneric
+
+    # Use custom profile if a sketch is selected.
+    sketch = None
+    for sel in Gui.Selection.getSelection():
+      if sel.TypeId == "Sketcher::SketchObject":
+        sketch = sel
+
     obj = doc.addObject("Part::FeaturePython", "Ring")
-    RingGeneric.RingGeneric(obj)
+    RingGeneric.RingGeneric(obj, sketch)
     obj.ViewObject.Proxy = 0
     doc.recompute()
 
   def GetResources(self):
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Ring', 'ToolTip': 'More detailed text'}
+
 
 
 class AddSetting:
@@ -35,6 +44,7 @@ class AddSetting:
 
   def GetResources(self):
     return {'Pixmap' : 'path_to_an_icon/myicon.png', 'MenuText': 'Add Setting', 'ToolTip': 'More detailed text'}
+
 
 
 class ProngSetting:

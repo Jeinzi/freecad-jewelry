@@ -9,7 +9,7 @@ This project provides tools for goldsmiths and jewelry designers to model rings 
 - Generating bezel settings for arbitrary faceted gemstones
 
 ## Basic Usage
-After [installation](https://wiki.freecad.org/How_to_install_additional_workbenches), switch to the Jewelry workbench. To add a ring, click on the "Add Ring" button to insert one with a default size. Afterwards, it can be selected and its parameters (like size and profile) edited in the properties tab.
+After [installation](https://wiki.freecad.org/How_to_install_additional_workbenches), switch to the Jewelry workbench. To add a ring, click on the "Add Ring" button to insert one with a default size. Afterwards, it can be selected and its parameters (like size and profile) edited in the properties tab. If you want to use your own sketch as a ring profile, you can select that before creating the ring or set it later using the "Custom Profile" property. The sketch must be on the YZ plane and the line defining the inner circumference must be on or touch the Y axis for the size to be correct. It will automatically be offset in the z direction by the inner radius of the ring.
 
 To insert a gemstone, search for an "open design" on [facetdiagrams.org](https://www.facetdiagrams.org/database/) and download the accompanying *.asc file. This can be imported into FreeCAD by selecting "File > Import" and choosing the downloaded model.
 The workbench can now automatically generate a bezel setting for the gem. To do so, just select it and click "Add setting".
