@@ -36,6 +36,12 @@ class RingGeneric:
 
 
   def execute(self, obj):
+    # Hide properties that are currently unuseful.
+    visibility = 0 if obj.CustomProfile is None else 2
+    for p in ["Width", "Thickness", "Profile"]:
+      obj.setEditorMode(p, visibility)
+
+    # Make ring.
     if obj.CustomProfile is not None:
       shape = obj.CustomProfile.Shape.copy()
       shape.Placement.Base.z = obj.Size/2/math.pi
